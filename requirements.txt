@@ -1,0 +1,11 @@
+# langchain
+# langchain-core
+# pypdf
+# python-dotenv
+
+langchain-community
+pymupdf
+sentence-transformers
+chromadb
+langchain-openai
+langsmith
