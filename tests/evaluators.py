@@ -1,9 +1,13 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from typing_extensions import Annotated, TypedDict
 
-from main import run_retrieval_query
+from config.config import OPENAI_MODEL
+from tests.evaluation import create_langsmith_dataset, populate_llm_response_and_source, client, dataset_name
 
-from evaluation import client, dataset_name
+load_dotenv(dotenv_path=Path(__file__).with_name(".env"))
 
 class CorrectnessGrade(TypedDict):
     explanation: Annotated[str,...,"Explanation your reasoning for the score"]
@@ -28,7 +32,7 @@ Avoid simply stating the correct answer at the outset."""
 
 
 
-grader_llm=ChatOpenAI(model="gpt-5.4", temperature=0.7).with_structured_output(CorrectnessGrade,
+grader_llm=ChatOpenAI(model=OPENAI_MODEL).with_structured_output(CorrectnessGrade,
                                                                         method="json_schema",
                                                                         strict=True)
 
@@ -69,7 +73,7 @@ Explain your reasoning in a step-by-step manner to ensure your reasoning and con
 
 Avoid simply stating the correct answer at the outset."""
 
-relevance_llm = ChatOpenAI(model="gpt-5.4", temperature=0).with_structured_output(RelevanceGrade, method="json_schema", strict=True)
+relevance_llm = ChatOpenAI(model=OPENAI_MODEL).with_structured_output(RelevanceGrade, method="json_schema", strict=True)
 
 def relevance(inputs: dict, outputs: dict) -> bool:
     """A simple evaluator for RAG answer helpfulness."""
@@ -101,7 +105,7 @@ Explain your reasoning in a step-by-step manner to ensure your reasoning and con
 
 Avoid simply stating the correct answer at the outset."""
 
-grounded_llm = ChatOpenAI(model="gpt-5.4", temperature=0).with_structured_output(GroundedGrade, method="json_schema", strict=True)
+grounded_llm = ChatOpenAI(model=OPENAI_MODEL).with_structured_output(GroundedGrade, method="json_schema", strict=True)
 
 def groundedness(inputs: dict, outputs: dict) -> bool:
     """A simple evaluator for RAG answer groundedness."""
@@ -132,7 +136,7 @@ Explain your reasoning in a step-by-step manner to ensure your reasoning and con
 
 Avoid simply stating the correct answer at the outset."""
 
-retrieval_relevance_llm = ChatOpenAI(model="gpt-5.4", temperature=0).with_structured_output(RetrievalRelevanceGrade, method="json_schema", strict=True)
+retrieval_relevance_llm = ChatOpenAI(model=OPENAI_MODEL).with_structured_output(RetrievalRelevanceGrade, method="json_schema", strict=True)
 
 def retrieval_relevance(inputs: dict, outputs: dict) -> bool:
     """An evaluator for document relevance"""
@@ -146,7 +150,10 @@ def retrieval_relevance(inputs: dict, outputs: dict) -> bool:
     return grade["relevant"]
 
 def target(inputs: dict) -> dict:
-    return run_retrieval_query(inputs["query"])
+    return llm_results[inputs["query"]]
+
+llm_results = populate_llm_response_and_source()
+create_langsmith_dataset()
 
 experiment_results = client.evaluate(
     target,
@@ -155,3 +162,6 @@ experiment_results = client.evaluate(
     experiment_prefix="rag-doc-relevance",
     metadata={"version": "LCEL context, gpt-4-0125-preview"},
 )
+
+print("LangSmith URL:", experiment_results.url)
+experiment_results.wait()

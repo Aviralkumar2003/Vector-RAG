@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
-from embedding_manager import EmbeddingManager
-from vector_store import VectorStore
+from src.rag.embedding_manager import EmbeddingManager
+from src.rag.vector_store import VectorStore
 
 
 class RAGRetriever:

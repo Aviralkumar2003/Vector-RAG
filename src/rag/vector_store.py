@@ -7,7 +7,7 @@ import numpy as np
 
 
 class VectorStore:
-    def __init__(self, collection_name:str="pdf_documents",persist_directory:str="./vector_store"):
+    def __init__(self, collection_name:str="pdf_documents",persist_directory:str="./data/vector_store"):
         self.collection_name=collection_name
         self.persist_directory=persist_directory
         self.client=None

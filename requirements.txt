@@ -9,3 +9,7 @@ sentence-transformers
 chromadb
 langchain-openai
 langsmith
+pandas
+openpyxl
+tabula-py
+jpype1
