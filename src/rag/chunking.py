@@ -4,7 +4,6 @@ import tabula
 processed_tables_directory = "data/processed_data/processed_tables"
 processed_text_directory = "data/processed_data/processed_text"
 
-# Create directories if they don't exist
 os.makedirs(processed_tables_directory, exist_ok=True)
 os.makedirs(processed_text_directory, exist_ok=True)
 

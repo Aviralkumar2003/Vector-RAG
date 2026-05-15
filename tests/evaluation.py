@@ -64,12 +64,10 @@ def populate_llm_response_and_source():
 def create_langsmith_dataset():
     _, dataset = get_dataset()
 
-    # Delete existing dataset to avoid mixing old and new examples
     if client.has_dataset(dataset_name=dataset_name):
         langsmith_dataset = client.read_dataset(dataset_name=dataset_name)
         client.delete_dataset(dataset_id=langsmith_dataset.id)
-    
-    # Create fresh dataset with current examples
+
     langsmith_dataset = client.create_dataset(dataset_name=dataset_name)
 
     client.create_examples(

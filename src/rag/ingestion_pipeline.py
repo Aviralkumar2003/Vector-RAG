@@ -1,4 +1,3 @@
-
 import os
 
 from langchain_core.documents import Document
@@ -45,7 +44,6 @@ def run_ingestion_pipeline(embedding_manager: EmbeddingManager, vector_store: Ve
         process_tables(doc, items, filepath)
         split_documents(doc, text_splitter, items, filepath)
 
-    # Convert items (dict format) to Document objects for consistent handling
     doc_objects = [
         Document(
             page_content=item["text"],
@@ -59,12 +57,9 @@ def run_ingestion_pipeline(embedding_manager: EmbeddingManager, vector_store: Ve
         for item in items
     ]
 
-    # Extract text content for embeddings
     texts = [item["text"] for item in items]
     
-    # Generate embeddings for all content (tables + text)
     embeddings = embedding_manager.generate_embeddings(texts)
     
-    # Add documents and embeddings to vector store
     vector_store.add_documents(doc_objects, embeddings)
     print("Ingestion pipeline completed successfully.")
