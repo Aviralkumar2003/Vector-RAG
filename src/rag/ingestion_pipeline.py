@@ -30,24 +30,19 @@ def run_ingestion_pipeline(embedding_manager: EmbeddingManager, vector_store: Ve
     documents=load_documents.load_pdf_documents(DATA_DIR)
 
 
-    text_splitter=RecursiveCharacterTextSplitter(
+    text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1200,
         chunk_overlap=300,
         length_function=len,
-        separators=["\n\n","\n"," ", ""]
+        separators=["\n\n", "\n", " ", ""]
     )
 
     items = []
 
-    # Process each document (each document is already a single page)
     for doc in tqdm(documents, desc="Processing PDF Pages"):
         filepath = os.path.join(DATA_DIR, doc.metadata.get("source", "_"))
-        source_name = doc.metadata.get("source", "unknown")  # Preserve source metadata
-        
-        # Extract and process tables from this page
+
         process_tables(doc, items, filepath)
-        
-        # Split and chunk text from this page
         split_documents(doc, text_splitter, items, filepath)
 
     # Convert items (dict format) to Document objects for consistent handling
@@ -58,7 +53,7 @@ def run_ingestion_pipeline(embedding_manager: EmbeddingManager, vector_store: Ve
                 "page": item["page"],
                 "type": item["type"],
                 "path": item["path"],
-                "source": doc.metadata.get("source", "unknown") if 'doc' in locals() else "unknown"
+                "source": item["source"]
             }
         )
         for item in items

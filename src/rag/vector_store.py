@@ -23,6 +23,7 @@ class VectorStore:
                 name=self.collection_name,
                 metadata={
                     "description": "PDF Document Embdeddings for RAG",
+                    "hnsw:space": "cosine"
                 }
             )
 

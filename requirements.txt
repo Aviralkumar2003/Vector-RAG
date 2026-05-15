@@ -1,13 +1,11 @@
-# langchain
-# langchain-core
-# pypdf
-# python-dotenv
-
+python-dotenv
 langchain-community
+langchain-core
+langchain-text-splitters
+langchain-openai
 pymupdf
 sentence-transformers
 chromadb
-langchain-openai
 langsmith
 pandas
 openpyxl

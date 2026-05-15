@@ -11,11 +11,11 @@ os.makedirs(processed_text_directory, exist_ok=True)
 
 def process_tables(doc, items, filepath):
     """
-    Extract tables from a single document page
-    and save them as text files.
+    Extract tables from a single document page and save each as a single text file.
     """
 
     page_num = doc.metadata.get("page", 0)
+    source = doc.metadata.get("source", "unknown")
 
     try:
         tables = tabula.read_pdf(
@@ -29,15 +29,10 @@ def process_tables(doc, items, filepath):
 
         for table_idx, table in enumerate(tables):
 
-            # Replace NaN values with empty strings
             table = table.fillna("")
 
-            # Convert dataframe rows into pipe-separated text
             table_text = "\n".join(
-                [
-                    " | ".join(map(str, row))
-                    for row in table.values
-                ]
+                " | ".join(map(str, row)) for row in table.values
             )
 
             table_file_name = os.path.join(
@@ -45,20 +40,15 @@ def process_tables(doc, items, filepath):
                 f"{os.path.basename(filepath)}_table_{page_num}_{table_idx}.txt"
             )
 
-            # Save extracted table text
-            with open(
-                table_file_name,
-                "w",
-                encoding="utf-8",
-                errors="ignore"
-            ) as f:
+            with open(table_file_name, "w", encoding="utf-8", errors="ignore") as f:
                 f.write(table_text)
 
             items.append({
                 "page": page_num,
                 "type": "table",
                 "text": table_text,
-                "path": table_file_name
+                "path": table_file_name,
+                "source": source
             })
 
     except Exception as e:
@@ -67,11 +57,11 @@ def process_tables(doc, items, filepath):
 
 def split_documents(doc, text_splitter, items, filepath):
     """
-    Split a single document into chunks
-    and save them as text files.
+    Split a single document into chunks and save them as text files.
     """
 
     page_num = doc.metadata.get("page", 0)
+    source = doc.metadata.get("source", "unknown")
 
     chunks = text_splitter.split_documents([doc])
 
@@ -82,20 +72,15 @@ def split_documents(doc, text_splitter, items, filepath):
             f"{os.path.basename(filepath)}_text_{page_num}_{chunk_idx}.txt"
         )
 
-        # Save chunk text
-        with open(
-            text_file_name,
-            "w",
-            encoding="utf-8",
-            errors="ignore"
-        ) as f:
+        with open(text_file_name, "w", encoding="utf-8", errors="ignore") as f:
             f.write(chunk.page_content)
 
         items.append({
             "page": page_num,
             "type": "text",
             "text": chunk.page_content,
-            "path": text_file_name
+            "path": text_file_name,
+            "source": source
         })
 
     return chunks

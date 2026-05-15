@@ -43,12 +43,35 @@ def get_rag_response(query: str, rag_retriever=None):
     if rag_retriever is None:
         rag_retriever = initialize_rag_system()
 
-    relevant_documents = rag_retriever.retrieve(query)
+    relevant_documents = rag_retriever.retrieve(query, top_k=10, score_threshold=0.35)
 
     model = ChatOpenAI(model=OPENAI_MODEL)
-    # model = ChatOpenAI(model=OPENAI_MODEL, temperature=0.7)
-    prompt = "User Query: " + query + "\n\n" + "Here are some relevant documents:\n" + "\n".join([doc["content"] for doc in relevant_documents]) + "\n\nBased on the above documents, please provide an answer to the user's query."
-    response = model.invoke(prompt)
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a financial analyst assistant. Answer questions strictly based on "
+                "the provided document excerpts. When a numeric value is requested, reproduce "
+                "it exactly as it appears in the documents. If the documents do not contain "
+                "enough information to answer, say so explicitly — do not guess or extrapolate. "
+                "Cite the page number when available."
+            )
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Question: {query}\n\n"
+                "Document Excerpts:\n"
+                + "\n\n---\n\n".join(
+                    f"[Page {doc['metadata'].get('page', 0) + 1}, "
+                    f"Type: {doc['metadata'].get('type', 'text')}]\n{doc['content']}"
+                    for doc in relevant_documents
+                )
+                + "\n\nAnswer:"
+            )
+        }
+    ]
+    response = model.invoke(messages)
     llm_source = get_llm_source(relevant_documents)
 
     return {"answer": response.content, "source": llm_source, "documents": relevant_documents}
