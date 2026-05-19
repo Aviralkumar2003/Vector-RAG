@@ -15,10 +15,14 @@ from langchain_community.document_loaders import PyMuPDFLoader
 def load_pdf_documents(path: str):
 
     all_documents=[]
-    pdf_dir=Path(path)
+    path_obj=Path(path)
 
-    pdf_files=list(pdf_dir.glob("**/*.pdf"))
-    print(f"Found {len(pdf_files)} PDF files in {path}")
+    if path_obj.is_file():
+        pdf_files = [path_obj]
+        print(f"Loading single PDF file: {path}")
+    else:
+        pdf_files=list(path_obj.glob("**/*.pdf"))
+        print(f"Found {len(pdf_files)} PDF files in {path}")
 
     for pdf_file in pdf_files:
         print(f"Loading {pdf_file}...")

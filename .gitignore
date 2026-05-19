@@ -3,3 +3,7 @@
 __pycache__
 vector_store
 processed_data
+sse.md
+system_design.md
+Task_Breakdown.md
+data/chat_history.db

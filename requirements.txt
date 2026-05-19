@@ -11,3 +11,6 @@ pandas
 openpyxl
 tabula-py
 jpype1
+fastapi
+uvicorn[standard]
+python-multipart

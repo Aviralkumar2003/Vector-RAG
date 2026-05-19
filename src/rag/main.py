@@ -50,9 +50,13 @@ def get_rag_response(query: str, rag_retriever=None):
         {
             "role": "system",
             "content": (
-                "You are a financial analyst assistant. Answer questions strictly based on "
-                "the provided document excerpts. When a numeric value is requested, reproduce "
-                "it exactly as it appears in the documents. If the documents do not contain "
+                # "You are a financial analyst assistant. Answer questions strictly based on "
+                # "the provided document excerpts. When a numeric value is requested, reproduce "
+                # "it exactly as it appears in the documents. If the documents do not contain "
+                # "enough information to answer, say so explicitly — do not guess or extrapolate. "
+                # "Cite the page number when available."
+                "You are a helpful assistant. Answer questions strictly based on "
+                "the provided document excerpts. If the documents do not contain "
                 "enough information to answer, say so explicitly — do not guess or extrapolate. "
                 "Cite the page number when available."
             )
